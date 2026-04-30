@@ -1,4 +1,4 @@
-# API Endpoints — Simplified
+# API Endpoints - Simplified
 
 This document provides a non-technical, easy-to-read summary of the backend API endpoints. For each endpoint you'll find the HTTP method and path, a short plain-language description, and the typical successful result or common errors.
 
