@@ -13,9 +13,9 @@ Let us take the scenario of there being a `main` branch, and branches `1.1`, `1.
 
 ```mermaid
 flowchart TD
-    A[Bug(s) discovered<br/>by QA / Support / Monitoring] --> B[Triage<br/>Reproduce and identify affected versions]
+    A["Bug(s) discovered<br/>by QA / Support / Monitoring"] --> B[Triage<br/>Reproduce and identify affected versions]
     B --> C[Write regression tests<br/>for the affected release branch]
-    C --> D[Develop and test hotfix(es)<br/>on release-1.2]
+    C --> D["Develop and test hotfix(es)<br/>on release-1.2"]
     D --> E[Bundle fixes into a CHF<br/>e.g. 1.2.1]
     E --> F[Release hotfix for the affected branch]
 
