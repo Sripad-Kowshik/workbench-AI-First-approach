@@ -39,3 +39,60 @@ flowchart TD
     I --> Q
     Q --> R[Mark bug report done and close it]
 ```
+```
+gitGraph
+   commit id: "v1.0"
+   
+   branch branch-1.1
+   checkout branch-1.1
+   commit id: "release-1.1"
+   
+   checkout main
+   branch branch-1.2
+   checkout branch-1.2
+   commit id: "release-1.2"
+   
+   checkout main
+   branch branch-1.3
+   checkout branch-1.3
+   commit id: "release-1.3"
+   
+   checkout main
+   commit id: "v2.0"
+   
+   %% CHF branch
+   checkout branch-1.2
+   branch CHF/bugs-A-B
+   checkout CHF/bugs-A-B
+   commit id: "Bug A & B reported"
+   commit id: "Triaged & reproduced"
+   commit id: "Write tests"
+   commit id: "Develop & test fixes"
+   
+   checkout branch-1.2
+   merge CHF/bugs-A-B
+   commit id: "release-1.2.1" tag: "CHF v1.2.1"
+   
+   %% Port fixes
+   checkout branch-1.1
+   commit id: "Back-port Bug A" tag: "from 1.2"
+   commit id: "Test Bug A"
+   
+   checkout branch-1.3
+   commit id: "Forward-port Bug B" tag: "from 1.2"
+   commit id: "Test Bug B"
+   
+   checkout main
+   branch reimpl/B
+   checkout reimpl/B
+   commit id: "Reimplement Bug B"
+   commit id: "Test"
+   
+   checkout main
+   merge reimpl/B
+   commit id: "Bug B complete"
+   
+   checkout branch-1.1
+   commit id: "EOL - v1.1"
+   commit id: "All bugs closed"
+```
