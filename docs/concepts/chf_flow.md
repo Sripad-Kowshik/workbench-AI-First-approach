@@ -39,7 +39,7 @@ flowchart TD
     I --> Q
     Q --> R[Mark bug report done and close it]
 ```
-```
+```mermaid
 gitGraph
    commit id: "v1.0"
    
