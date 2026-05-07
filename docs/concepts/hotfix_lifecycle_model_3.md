@@ -12,9 +12,9 @@ The product runs as customer-managed VM appliances deployed across telecom envir
 
 Customers:
 
-AIR → Airtel
-REL → Reliance
-TAT → Tata
+- AIR → Airtel
+- REL → Reliance
+- TAT → Tata
 
 Devices per customer: D1, D2, D3
 
