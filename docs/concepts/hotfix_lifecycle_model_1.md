@@ -139,8 +139,8 @@ V --> W[Postmortem & Platformization Discussion]
 gitGraph
 
 commit id: "v1.0.9"
-branch release/1.1-lts
-checkout release/1.1-lts
+branch release/1.1
+checkout release/1.1
 
 commit id: "v1.1.0"
 commit id: "v1.1.1"
@@ -151,14 +151,14 @@ checkout main
 commit id: "2.x redesign work"
 commit id: "new reconciliation engine"
 
-checkout release/1.1-lts
+checkout release/1.1
 
 branch hotfix/hf21
 checkout hotfix/hf21
 
 commit id: "HF21 - DHCP reconcile loop fix"
 
-checkout release/1.1-lts
+checkout release/1.1
 merge hotfix/hf21
 
 branch hotfix/hf22
@@ -166,7 +166,7 @@ checkout hotfix/hf22
 
 commit id: "HF22 - DB retry tuning"
 
-checkout release/1.1-lts
+checkout release/1.1
 merge hotfix/hf22
 
 commit id: "v1.1.3-HF22 released"
