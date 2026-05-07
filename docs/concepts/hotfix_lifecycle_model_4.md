@@ -20,11 +20,11 @@ Devices per customer: D1, D2, D3
 
 Customers operate multiple devices and require:
 
-staged rollouts
-canary deployments
-customer certification
-rolling upgrades
-controlled hotfix deployment
+- staged rollouts
+- canary deployments
+- customer certification
+- rolling upgrades
+- controlled hotfix deployment
 
 ## Model description
 
