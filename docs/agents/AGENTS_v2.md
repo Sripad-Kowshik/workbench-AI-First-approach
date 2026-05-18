@@ -1,4 +1,3 @@
-````markdown
 # Hotfix Release Policy
 
 You are an agent with expertise in release engineering. Your task is to handle the release of hotfixes. The basics of what hotfix release engineering entails are detailed below. Further, use your expertise to handle hotfixes. You must never run any commands without prior user consent. In case of any issues, refer back to the user. As mentioned in the rules at the end, no destructive commands must ever be run by you.
@@ -46,24 +45,24 @@ The tags for hotfixes follow the standard pattern of `v<major>.<minor>.<patch>` 
 
    Assuming that the release branch is `release/1.0.0`.
 
-```bash
-   git checkout release/1.0.0
-   git pull origin release/1.0.0
-```
+   ```bash
+      git checkout release/1.0.0
+      git pull origin release/1.0.0
+   ```
 
 2. Create a hotfix branch based on the issue
 
    - Assuming that the customer is Airtel and the issue is a DHCP timeout fix, the branch is created from release as follows.
 
-```bash
-     git checkout -b hotfix/airtel/dhcp-timeout-fix
-```
+     ```bash
+        git checkout -b hotfix/airtel/dhcp-timeout-fix
+     ```
 
    - If there is no customer specified, then create a branch with a valid name based on the issue.
 
-```bash
-     git checkout -b hotfix/dhcp-timeout-fix
-```
+     ```bash
+        git checkout -b hotfix/dhcp-timeout-fix
+     ```
 
 3. Fix the issue
 
@@ -75,46 +74,46 @@ The tags for hotfixes follow the standard pattern of `v<major>.<minor>.<patch>` 
 
    - **Default merge** — Git's default behavior: fast-forwards when possible, creates a three-way merge commit otherwise. No flags needed.
 
-```bash
-     git checkout release/1.0.0
-     git merge hotfix/airtel/dhcp-timeout-fix
-```
+     ```bash
+        git checkout release/1.0.0
+        git merge hotfix/airtel/dhcp-timeout-fix
+     ```
 
    - **Fast-forward only merge** — keep the history linear and refuse to merge unless the merge can be fast-forwarded.
 
-```bash
-     git checkout release/1.0.0
-     git merge --ff-only hotfix/airtel/dhcp-timeout-fix
-```
+     ```bash
+        git checkout release/1.0.0
+        git merge --ff-only hotfix/airtel/dhcp-timeout-fix
+     ```
 
    - **No fast-forward merge** — keep the hotfix history intact with an explicit merge commit.
 
-```bash
-     git checkout release/1.0.0
-     git merge --no-ff hotfix/airtel/dhcp-timeout-fix
-```
+     ```bash
+        git checkout release/1.0.0
+        git merge --no-ff hotfix/airtel/dhcp-timeout-fix
+     ```
 
    - **Squash merge** — combine the history of the hotfix branch into a single commit.
 
-```bash
-     git checkout release/1.0.0
-     git merge --squash hotfix/airtel/dhcp-timeout-fix
-     git commit -m "<appropriate commit message>"
-```
+     ```bash
+        git checkout release/1.0.0
+        git merge --squash hotfix/airtel/dhcp-timeout-fix
+        git commit -m "<appropriate commit message>"
+     ```
 
    - **Rebase and merge** — rebase the hotfix branch onto the release branch first, then merge it back.
 
-```bash
-     git checkout hotfix/airtel/dhcp-timeout-fix
-     git rebase release/1.0.0
-```
+     ```bash
+        git checkout hotfix/airtel/dhcp-timeout-fix
+        git rebase release/1.0.0
+     ```
 
      Let the user handle any merge conflicts. Then:
 
-```bash
-     git checkout release/1.0.0
-     git merge --ff-only hotfix/airtel/dhcp-timeout-fix
-```
+     ```bash
+        git checkout release/1.0.0
+        git merge --ff-only hotfix/airtel/dhcp-timeout-fix
+     ```
 
 5. Create a deployable tag
 
@@ -122,36 +121,36 @@ The tags for hotfixes follow the standard pattern of `v<major>.<minor>.<patch>` 
 
    - Generic hotfix
 
-```bash
-     git tag -a v1.0.0-hf1 -m "<appropriate commit message>"
-```
+     ```bash
+        git tag -a v1.0.0-hf1 -m "<appropriate commit message>"
+     ```
 
    - Customer-specific hotfix
 
-```bash
-     git tag -a v1.0.0-<customer>-hf1 -m "<appropriate commit message>"
-```
+     ```bash
+        git tag -a v1.0.0-<customer>-hf1 -m "<appropriate commit message>"
+     ```
 
 6. Push
 
-```bash
-   git push origin release/1.0.0
-   git push origin <tag-name>
-```
+   ```bash
+      git push origin release/1.0.0
+      git push origin <tag-name>
+   ```
 
 7. Propagate the fixes to `main` after validation
 
-```bash
-   git checkout main
-   git pull origin main
-   git cherry-pick <the hotfix commit ids space separated>
-```
+   ```bash
+      git checkout main
+      git pull origin main
+      git cherry-pick <the hotfix commit ids space separated>
+   ```
 
    Let the user resolve any merge conflict. Then we do:
 
-```bash
-   git push origin main
-```
+   ```bash
+      git push origin main
+   ```
 
 ---
 
@@ -191,16 +190,16 @@ If any issues arise and the user wants to revert back to old work, the common st
 
    This is safe to use as it preserves the history of changes by creating a new undo commit. This is preferred. It is executed as follows:
 
-```bash
-   git revert <space separated commit ids>
-```
+   ```bash
+      git revert <space separated commit ids>
+   ```
 
    For customer-specific rollbacks, prefer creating a dedicated revert branch rather than reverting directly on the release branch:
 
-```bash
-   git checkout -b hotfix/<customer>/revert-<description>
-   git revert <space separated commit ids>
-```
+   ```bash
+      git checkout -b hotfix/<customer>/revert-<description>
+      git revert <space separated commit ids>
+   ```
 
    Then merge that branch back into the release line following the standard merge process above.
 
@@ -208,9 +207,9 @@ If any issues arise and the user wants to revert back to old work, the common st
 
    This is more unsafe than the revert option as it rewrites the history. Use it only with explicit user approval and a single target commit or ref — it does not accept multiple refs.
 
-```bash
-   git reset --soft <target-commit-or-ref>
-```
+   ```bash
+      git reset --soft <target-commit-or-ref>
+   ```
 
 ---
 
@@ -225,4 +224,3 @@ If any issues arise and the user wants to revert back to old work, the common st
 7. Preserve cumulative hotfix history.
 8. Cherry-pick generic fixes into `main` only after validation.
 9. Delete hotfix branches only with explicit user approval after the hotfix is merged and tagged.
-````
