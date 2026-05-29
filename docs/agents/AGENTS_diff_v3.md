@@ -31,10 +31,10 @@ You will receive a handoff envelope from the orchestrator containing:
 0. Dynamic path setup + Load Company Knowledge (NEW – mandatory first step)
    
    ```bash
-      REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || echo ".")
-      AGENTS_ROOT="${REPO_ROOT}/.hotfix-agents"
-      cat "${AGENTS_ROOT}/context/company/release-style.md"
-      cat "${AGENTS_ROOT}/context/skills/hotfix-skills.json"
+   REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || echo ".")
+   AGENTS_ROOT="${REPO_ROOT}/.hotfix-agents"
+   cat "${AGENTS_ROOT}/context/company/release-style.md"
+   cat "${AGENTS_ROOT}/context/skills/hotfix-skills.json"
    ```
    
    Apply any company-specific diff strategies, file-exclusion patterns, or commit-mapping rules before analysis.
