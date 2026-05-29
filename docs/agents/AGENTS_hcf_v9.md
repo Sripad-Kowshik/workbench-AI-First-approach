@@ -239,8 +239,8 @@ cat "${AGENTS_ROOT}/context/RELEASE-KNOWLEDGE.md"
 cat "${AGENTS_ROOT}/context/company/release-style.md"
 cat "${AGENTS_ROOT}/context/skills/hotfix-skills.json" | head -c 4000
 ```
-Inject relevant customer layout and skills into every handoff envelope for diffing & packaging agents
-Log loaded knowledge summary in CHF-STATE.md
+
+Inject relevant customer layout and skills into every handoff envelope for diffing & packaging agents. Log loaded knowledge summary in `CHF-STATE.md`.
 
 ### Step 1: Start from a release branch
 
@@ -342,6 +342,7 @@ git push origin main
 REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || echo ".")
 AGENTS_ROOT="${REPO_ROOT}/.hotfix-agents"
 ```
+
 Invoke Learner Agent with the inputs defined in `AGENTS_learner_v1.md`. Present proposals to user with clear A/B/C/D options. On approval, append to knowledge files (never overwrite old sections). Update `HOTFIX-HISTORY.md` and log outcome
 
 ## Escalation Contract
