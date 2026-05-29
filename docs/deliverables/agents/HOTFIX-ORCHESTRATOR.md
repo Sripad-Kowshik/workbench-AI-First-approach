@@ -20,7 +20,7 @@ Hotfixes are always created from a `release/*` branch, consolidated from a sourc
 ├── ... (actual source files in the project)
 │
 ├── .hotfix-agents/                  # ← Agent tooling (committed to git)
-│   ├── AGENTS_hcf.md
+│   ├── AGENTS_chf.md
 │   ├── AGENTS_diff.md
 │   ├── AGENTS_pack.md
 │   ├── HOTFIX-ORCHESTRATOR.md       # ← This file
@@ -40,7 +40,7 @@ Hotfixes are always created from a `release/*` branch, consolidated from a sourc
 
 ### The Three Agents (do not modify their content)
 
-1. **`AGENTS_hcf.md`** — Main orchestrator (follow this file exactly)
+1. **`AGENTS_chf.md`** — Main orchestrator (follow this file exactly)
 2. **`AGENTS_diff.md`** — Diffing agent (pure analysis)
 3. **`AGENTS_pack.md`** — Packaging agent (produces install/rollback bundle)
 
@@ -51,16 +51,16 @@ When the user gives any hotfix request:
 1. Read this file + the three agent files in `.hotfix-agents/`.
 2. **If your harness supports multi-agent spawning** (preferred):
    - Spawn three separate agents/contexts (one per agent file).
-     - One for HCF (orchestrator)
+     - One for CHF (orchestrator)
      - One for Diffing
      - One for Packaging
-   - Pass structured handoff envelopes (JSON) exactly as defined in `AGENTS_hcf.md`.
+   - Pass structured handoff envelopes (JSON) exactly as defined in `AGENTS_chf.md`.
    - This prevents context bloat and keeps each agent focused.
 3. **If single-context only**:
-   - Load `AGENTS_hcf.md` first, then load the other agents on handoff.
-     - That is, when the HCF agent emits a `diff_request` or `packaging_request`, immediately load the corresponding agent file (`AGENTS_diff.md` or `AGENTS_pack.md`) into the same context and continue.
+   - Load `AGENTS_chf.md` first, then load the other agents on handoff.
+     - That is, when the CHF agent emits a `diff_request` or `packaging_request`, immediately load the corresponding agent file (`AGENTS_diff.md` or `AGENTS_pack.md`) into the same context and continue.
    - **Never combine the three agent files into one prompt** unless absolutely necessary.
-4. Always follow `AGENTS_hcf.md` literally from Step 0 onward.
+4. Always follow `AGENTS_chf.md` literally from Step 0 onward.
 5. Maintain `CHF-STATE.md` (transient) and `HOTFIX-HISTORY.md` (permanent) and log the actions into them accordingly.
 6. Never invents steps or skip safety gates.
 7. Escalate with clear lettered options (A/B/C/D) on any ambiguity.
@@ -114,12 +114,12 @@ Create hotfix for Airtel. Ticket: AIR-089. Description: dhcp-timeout-improvement
 - Read this file + the three agent files in `.hotfix-agents/`.
 - Wait for a user command matching the style above.
 - Begin by acknowledging the request, showing your plan, and executing step by step.
-- Follow `AGENTS_hcf.md` step-by-step (it will tell you exactly when to invoke the diffing and packaging agents).
+- Follow `AGENTS_chf.md` step-by-step (it will tell you exactly when to invoke the diffing and packaging agents).
 - Maintain `CHF-STATE.md` and `HOTFIX-HISTORY.md`.
-- Always escalate with lettered options (A/B/C/D) when the HCF agent tells you to.
+- Always escalate with lettered options (A/B/C/D) when the CHF agent tells you to.
 - Never run destructive git commands without explicit user confirmation.
 
-Start by reading `AGENTS_hcf.md` completely, then wait for the first user hotfix request.
+Start by reading `AGENTS_chf.md` completely, then wait for the first user hotfix request.
 
 You are now ready to perform consolidated hotfixes for any tenant.
 
