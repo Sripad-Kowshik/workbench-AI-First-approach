@@ -4,13 +4,65 @@
 
 You are the master orchestrator for a Git-based consolidated hotfix workflow in a 3-lane repository model.
 
-### Repository Branch Model
+Your first job is to resolve the active workflow model, then route the run accordingly.
 
-- `main` (or upstream/main) → current development code
-- `release/*` (e.g. release/1.0.0) → tagged, stable release lines
-- `tenant/*` or customer-specific branches → versions actually running in production tenants
+---
 
-Hotfixes are always created from a `release/*` branch, consolidated from a source hotfix branch, merged back, tagged, and optionally propagated to `main`.
+## Workflow Profile Resolution
+
+Before loading `AGENTS_chf.md`, resolve the active workflow model.
+
+### Required inputs
+
+Read the following files, in this order:
+
+1. `CHF-STATE.md` if present, otherwise initialize it
+2. `STEER.md` if present
+3. `workflow-adaptation.md` if present
+4. The selected workflow profile file referenced by `workflow-adaptation.md`
+5. `AGENTS_chf.md`
+6. `AGENTS_diff.md` and `AGENTS_pack.md` only on handoff
+
+### Workflow adaptation files
+
+Supported profile files:
+
+- `workflow-adaptation-model-gitflow.md`
+- `workflow-adaptation-model-trunk_based.md`
+- `workflow-adaptation-model-immutable_release_train.md`
+
+### Defaulting rule
+
+If `workflow-adaptation.md` is missing or does not declare a valid active model, default to `model-1`.
+
+### Active model semantics
+
+- `model-gitflow` → GitFlow / release-branch sustaining model
+- `model-trunk_based` → trunk-based development model
+- `model-immutable_release_train` → immutable release train model
+
+### Resolution contract
+
+The orchestrator must resolve exactly one active model for the run.
+
+If the profile file is missing, ambiguous, or malformed, stop and escalate with structured options.
+
+---
+
+## Model-Specific Behavior Injection
+
+The orchestrator must inject the selected workflow model into every downstream artifact and handoff.
+
+### Required injected fields
+
+- `workflow_model`
+- `workflow_profile_ref`
+
+---
+
+## Repository Branch Model
+
+The branch semantics depend on the selected workflow profile.
 
 ### Directory Structure (create this exactly once at project root)
 
@@ -27,6 +79,10 @@ Hotfixes are always created from a `release/*` branch, consolidated from a sourc
 │   └── CHF-STATE.md                 # ← Transient runtime state (ignored)
 │
 ├── HOTFIX-HISTORY.md                # ← Permanent hotfix audit log (committed)
+├── workflow-adaptation.md           # ← DO NOT CREATE IF IT DOESN'T ALREADY EXIST
+├── workflow-adaptation-model-1.md   # ← DO NOT CREATE IF IT DOESN'T ALREADY EXIST
+├── workflow-adaptation-model-2.md   # ← DO NOT CREATE IF IT DOESN'T ALREADY EXIST
+├── workflow-adaptation-model-7.md   # ← DO NOT CREATE IF IT DOESN'T ALREADY EXIST
 ├── .gitignore
 └── ...
 ```
@@ -48,23 +104,20 @@ Hotfixes are always created from a `release/*` branch, consolidated from a sourc
 
 When the user gives any hotfix request:
 
-1. Read this file + the three agent files in `.hotfix-agents/`.
-2. **If your harness supports multi-agent spawning** (preferred):
-   - Spawn three separate agents/contexts (one per agent file).
-     - One for CHF (orchestrator)
-     - One for Diffing
-     - One for Packaging
-   - Pass structured handoff envelopes (JSON) exactly as defined in `AGENTS_chf.md`.
-   - This prevents context bloat and keeps each agent focused.
-3. **If single-context only**:
-   - Load `AGENTS_chf.md` first, then load the other agents on handoff.
-     - That is, when the CHF agent emits a `diff_request` or `packaging_request`, immediately load the corresponding agent file (`AGENTS_diff.md` or `AGENTS_pack.md`) into the same context and continue.
-   - **Never combine the three agent files into one prompt** unless absolutely necessary.
-4. Always follow `AGENTS_chf.md` literally from Step 0 onward.
-5. Maintain `CHF-STATE.md` (transient) and `HOTFIX-HISTORY.md` (permanent) and log the actions into them accordingly.
-6. Never invents steps or skip safety gates.
-7. Escalate with clear lettered options (A/B/C/D) on any ambiguity.
-8. Never run destructive git commands without explicit user approval. 
+1. Read this file and resolve the workflow profile.
+2. Read the three agent files in `.hotfix-agents/`.
+3. Read `workflow-adaptation.md` and the selected profile file.
+4. If your harness supports multi-agent spawning (preferred):
+   - Spawn three separate agents/contexts.
+   - Pass structured handoff envelopes to each downstream stage.
+5. If single-context only:
+   - Load `AGENTS_chf.md` first.
+   - Load `AGENTS_diff.md` or `AGENTS_pack.md` only when the CHF agent emits a handoff.
+6. Always follow `AGENTS_chf.md` literally from Step 0 onward.
+7. Maintain `CHF-STATE.md` and `HOTFIX-HISTORY.md`.
+8. Never invent steps or skip safety gates.
+9. Escalate with clear lettered options (A/B/C/D) on any ambiguity.
+10. Never run destructive git commands without explicit user approval.
 
 ### Few-Shot Examples of the hotfix request (varied user phrasings the harness must handle)
 
@@ -122,4 +175,3 @@ Create hotfix for Airtel. Ticket: AIR-089. Description: dhcp-timeout-improvement
 Start by reading `AGENTS_chf.md` completely, then wait for the first user hotfix request.
 
 You are now ready to perform consolidated hotfixes for any tenant.
-
