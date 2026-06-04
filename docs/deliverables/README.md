@@ -40,11 +40,11 @@ How the agents files should be placed in a typical project.
 **Example prompts for harness:**
 
 ```
-Initialize a hotfix run for Tata. Ticket: TAT-101. Description: dns-resolution-fix. The source branch to consolidate is hotfix/dhcp-scope-exhaustion.
+Initialize a hotfix run for Tata. Ticket: TAT-101. Description: dns-resolution-fix. The source branch to consolidate is hotfix/tata/dhcp-scope-exhaustion.
 ```
 
 ```
-Start consolidated hotfix for Vodafone. Ticket: VOD-142. Description: memory-leak-fix. Source branch: hotfix/duplicate-ip.
+Start consolidated hotfix for Vodafone. Ticket: VOD-142. Description: memory-leak-fix. Source branch: hotfix/vodafone/duplicate-ip.
 ```
 
 ---
@@ -66,7 +66,7 @@ Here is the request:
 Initialize a hotfix run for Tata. 
 Ticket: TAT-101. 
 Description: dns-resolution-fix. 
-The source branch to consolidate is hotfix/dhcp-scope-exhaustion.
+The source branch to consolidate is hotfix/tata/dhcp-scope-exhaustion.
 ```
 
 After this run has completed, other prompts can follow.
@@ -104,17 +104,17 @@ Here is the request:
 Initialize a hotfix run for Tata. 
 Ticket: TAT-101. 
 Description: dns-resolution-fix. 
-The source branch to consolidate is hotfix/dhcp-scope-exhaustion.
+The source branch to consolidate is hotfix/tata/dhcp-scope-exhaustion.
 ```
 
 **Example prompts for chat (use after the setup above):**
 
 ```
-Hotfix for Tata - TAT-101 - dns-resolution-fix using source branch hotfix/dhcp-scope-exhaustion
+Hotfix for Tata - TAT-101 - dns-resolution-fix using source branch hotfix/tata/dhcp-scope-exhaustion
 ```
 
 ```
-Start consolidated hotfix for Vodafone. Ticket: VOD-142. Description: memory-leak-fix. Source branch: hotfix/duplicate-ip.
+Start consolidated hotfix for Vodafone. Ticket: VOD-142. Description: memory-leak-fix. Source branch: hotfix/vodafone/duplicate-ip.
 ```
 
 ```
