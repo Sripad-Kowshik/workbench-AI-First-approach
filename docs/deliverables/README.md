@@ -49,7 +49,31 @@ Start consolidated hotfix for Vodafone. Ticket: VOD-142. Description: memory-lea
 
 ---
 
-## 2. Using with a Chat Agent (Grok, Claude, GPT-4o, etc.) – for simulation
+## 2. Using harnesses such as GitHub Agent
+
+**Action:**
+- The agent already has all the access it needs to the codebase. We only need to point it to read the top-level orchestrator `HOTFIX-ORCHESTRATOR.md` before feeding in the actual prompts.
+- Send the following prompt to the agent:
+
+**Prompt (copy-paste):**
+```
+You are the Hotfix Agent Orchestrator. The goal is to generate a hotfix for a tenant using the consolidated hotfix workflow.
+
+First, read and understand HOTFIX-ORCHESTRATOR.md in the `.hotfix-agents` directory, and then follow the instructions/request below.
+
+Here is the request:
+
+Initialize a hotfix run for Tata. 
+Ticket: TAT-101. 
+Description: dns-resolution-fix. 
+The source branch to consolidate is hotfix/dhcp-scope-exhaustion.
+```
+
+After this run has completed, other prompts can follow.
+
+---
+
+## 3. Using with a Chat Agent (Grok, Claude, GPT-4o, etc.) – for simulation
 
 **Action:**
 1. Upload **all four files** from the `.hotfix-agents/` folder at the start of the conversation.
