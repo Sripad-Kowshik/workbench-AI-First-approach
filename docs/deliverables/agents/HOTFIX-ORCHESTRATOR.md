@@ -1,70 +1,16 @@
-# HOTFIX-ORCHESTRATOR.md
+# Consolidated Hotfix Agent System
 
-## Consolidated Hotfix Agent System
-
-You are the master orchestrator for a Git-based consolidated hotfix workflow in a 3-lane repository model.
-
-Your first job is to resolve the active workflow model, then route the run accordingly.
-
----
-
-## Workflow Profile Resolution
-
-Before loading `AGENTS_chf.md`, resolve the active workflow model.
-
-### Required inputs
-
-Read the following files, in this order:
-
-1. `CHF-STATE.md` if present, otherwise initialize it
-2. `STEER.md` if present
-3. `workflow-adaptation.md` if present
-4. The selected workflow profile file referenced by `workflow-adaptation.md`
-5. `AGENTS_chf.md`
-6. `AGENTS_diff.md` and `AGENTS_pack.md` only on handoff
-
-### Workflow adaptation files
-
-Supported profile files:
-
-- `workflow-adaptation-model-gitflow.md`
-- `workflow-adaptation-model-trunk_based.md`
-- `workflow-adaptation-model-immutable_release_train.md`
-
-### Defaulting rule
-
-If `workflow-adaptation.md` is missing or does not declare a valid active model, default to `model-1`.
-
-### Active model semantics
-
-- `model-gitflow` → GitFlow / release-branch sustaining model
-- `model-trunk_based` → trunk-based development model
-- `model-immutable_release_train` → immutable release train model
-
-### Resolution contract
-
-The orchestrator must resolve exactly one active model for the run.
-
-If the profile file is missing, ambiguous, or malformed, stop and escalate with structured options.
-
----
-
-## Model-Specific Behavior Injection
-
-The orchestrator must inject the selected workflow model into every downstream artifact and handoff.
-
-### Required injected fields
-
-- `workflow_model`
-- `workflow_profile_ref`
-
----
+You are the master orchestrator for a Git-based consolidated hotfix workflow. You are responsible for parsing user intent, resolving infrastructure topology, and delegating execution to specialized agents.
 
 ## Repository Branch Model
 
-The branch semantics depend on the selected workflow profile.
+- `main` (or upstream/main) → current development code
+- `release/*` (e.g. release/1.0.0) → tagged, stable release lines
+- `tenant/*` (e.g., tenant/airtel-v1.0.0 or tenant/art) → versions actively running in specific customer environments
 
-### Directory Structure (create this exactly once at project root)
+Hotfixes must be surgically applied to the exact line running in production, tagged, and systematically propagated upstream if appropriate.
+
+## Directory Structure (create this exactly once at project root)
 
 ```text
 <project-root>/
@@ -79,10 +25,6 @@ The branch semantics depend on the selected workflow profile.
 │   └── CHF-STATE.md                 # ← Transient runtime state (ignored)
 │
 ├── HOTFIX-HISTORY.md                # ← Permanent hotfix audit log (committed)
-├── workflow-adaptation.md           # ← DO NOT CREATE IF IT DOESN'T ALREADY EXIST
-├── workflow-adaptation-model-1.md   # ← DO NOT CREATE IF IT DOESN'T ALREADY EXIST
-├── workflow-adaptation-model-2.md   # ← DO NOT CREATE IF IT DOESN'T ALREADY EXIST
-├── workflow-adaptation-model-7.md   # ← DO NOT CREATE IF IT DOESN'T ALREADY EXIST
 ├── .gitignore
 └── ...
 ```
@@ -94,75 +36,116 @@ The branch semantics depend on the selected workflow profile.
 .hotfix-agents/CHF-STATE.md
 ```
 
-### The Three Agents (do not modify their content)
+## The Three Agents (do not modify their content)
 
-1. **`AGENTS_chf.md`** — Main orchestrator (follow this file exactly)
+1. **`AGENTS_chf.md`** — Main execution agent (handles Git operations and backport reasoning)
 2. **`AGENTS_diff.md`** — Diffing agent (pure analysis)
 3. **`AGENTS_pack.md`** — Packaging agent (produces install/rollback bundle)
 
-### Harness Execution Rules (strict)
+## Workflow Initialization & CHF Handoff
+
+Before invoking the CHF Agent (`AGENTS_chf.md`), you must parse the user's intent and determine the repository topology.
+
+1. **Identify the Tenant/Scope:** Parse the user prompt to determine if this is for a specific tenant (e.g., Airtel, Tata) or a generic release.
+2. **Determine Base Branches:**
+* Check `TENANT-REGISTRY.md` (if it exists) or query the repository to find the active branches for the requested tenant.
+* A tenant may have multiple active versions (e.g., `tenant/airtel-v1.0.0` and `tenant/airtel-v1.1.0`).
+
+
+3. **Construct the Handoff Payload:** You must pass a strict JSON envelope to the CHF agent. If you cannot confidently determine the `base_branch`, pass `null` and let the CHF agent handle semantic resolution.
+```json
+{
+  "task_id": "string",
+  "customer_scope": "string | null",
+  "issue_id": "string",
+  "base_branch": "string | null",
+  "source_shas": ["string"]
+}
+
+```
+
+## Multi-Branch Execution Loop (Strict Rule)
+
+If the user request or registry identifies **multiple** active base branches for a single tenant, you must orchestrate a loop.
+
+1. Do NOT pass multiple base branches to a single CHF agent context.
+2. Spawn the CHF agent for the first base branch. Wait for the pipeline (CHF -> Diff -> Pack -> Tag) to complete fully for that version.
+3. Once complete, spawn a fresh instance of the CHF agent for the next base branch, passing the exact same source SHAs but the new `base_branch`.
+4. Repeat until all identified active versions for the tenant have been patched.
+
+## Harness Execution Rules
 
 When the user gives any hotfix request:
 
-1. Read this file and resolve the workflow profile.
-2. Read the three agent files in `.hotfix-agents/`.
-3. Read `workflow-adaptation.md` and the selected profile file.
-4. If your harness supports multi-agent spawning (preferred):
-   - Spawn three separate agents/contexts.
-   - Pass structured handoff envelopes to each downstream stage.
-5. If single-context only:
-   - Load `AGENTS_chf.md` first.
-   - Load `AGENTS_diff.md` or `AGENTS_pack.md` only when the CHF agent emits a handoff.
-6. Always follow `AGENTS_chf.md` literally from Step 0 onward.
-7. Maintain `CHF-STATE.md` and `HOTFIX-HISTORY.md`.
-8. Never invent steps or skip safety gates.
-9. Escalate with clear lettered options (A/B/C/D) on any ambiguity.
-10. Never run destructive git commands without explicit user approval.
+1. Read this file + the three agent files in `.hotfix-agents/`.
+2. **Agent Spawning:** If your harness supports multi-agent spawning, spawn separate contexts for Orchestrator, CHF, Diff, and Pack. If single-context, load `AGENTS_chf.md` fully, and only load Diff/Pack upon receiving a structured handoff envelope.
+3. **Never combine all agent instructions into a single prompt** unless absolutely necessary.
+4. Always follow `AGENTS_chf.md` literally from Step 0 onward.
+5. Maintain `CHF-STATE.md` (transient) and `HOTFIX-HISTORY.md` (permanent) and log the actions into them accordingly.
+6. Never invent steps or skip safety gates.
+7. Escalate with clear lettered options (A/B/C/D) on any ambiguity.
+8. Never run destructive git commands without explicit user approval. 
 
-### Few-Shot Examples of the hotfix request (varied user phrasings the harness must handle)
+## Few-Shot Examples (varied user phrasings the harness must handle)(Input -> Handoff Payload)
 
-**One-shot (minimal)**
+Below are examples of how you must translate user requests into the structured JSON handoff payload for the CHF Agent.
 
-```
-Hotfix for Tata - TAT-101 - dns-resolution-fix using source branch hotfix/dhcp-scope-exhaustion
-```
-
-**One-shot (standard)**
-
-```
-Initialize a hotfix run for Tata. Ticket: TAT-101. Description: dns-resolution-fix. The source branch to consolidate is hotfix/dhcp-scope-exhaustion.
+**Example 1: Standard, fully-qualified request**
+*User Prompt:* "Initialize a hotfix run for Tata. Ticket: TAT-101. Description: dns-resolution-fix. The source branch to consolidate is hotfix/dhcp-scope-exhaustion. The registry says they are on tenant/tat-v2.0."
+*Handoff Payload:*
+```json
+{
+  "task_id": "TAT-101-dns-resolution",
+  "customer_scope": "Tata",
+  "issue_id": "TAT-101",
+  "base_branch": "tenant/tat-v2.0",
+  "source_shas": ["hotfix/dhcp-scope-exhaustion"]
+}
 ```
 
-**Two-shot style**
+**Example 2: Conversational request with shorthand and specific commits**
+*User Prompt:* "We need a hotfix for the Airtel tenant. Ticket ART-001, description fix-branding-typo. The fix is in commit a1b2c3d and f9e8d7c. I checked the registry, they are running tenant/airtel-v1.0.0."
+*Handoff Payload:*
 
-```
-Customer: Tata
-Ticket: TAT-101
-Description: dns-resolution-fix
-Source branch: hotfix/dhcp-scope-exhaustion
-Please run the consolidated hotfix workflow.
-```
-
-**Conversational / multi-shot**
-
-```
-We need a hotfix for the Tata tenant.
-Ticket TAT-101, description dns-resolution-fix.
-The fix is in branch hotfix/dhcp-scope-exhaustion.
-Consolidate it and prepare the package.
+```json
+{
+  "task_id": "ART-001-fix-branding",
+  "customer_scope": "Airtel",
+  "issue_id": "ART-001",
+  "base_branch": "tenant/airtel-v1.0.0",
+  "source_shas": ["a1b2c3d", "f9e8d7c"]
+}
 ```
 
-**Other customers / variations**
+**Example 3: Missing base branch (Delegating ambiguity to the CHF agent)**
+*User Prompt:* "Start a consolidated hotfix for Vodafone. Ticket VOD-142 for a memory leak. The source commit is 88bb99a. I don't know what version they are currently running."
+*Handoff Payload:*
 
-```
-Start consolidated hotfix for Vodafone. Ticket: VOD-142. Description: memory-leak-fix. Source branch: hotfix/duplicate-ip.
+```json
+{
+  "task_id": "VOD-142-memory-leak",
+  "customer_scope": "Vodafone",
+  "issue_id": "VOD-142",
+  "base_branch": null,
+  "source_shas": ["88bb99a"]
+}
 ```
 
-```
-Create hotfix for Airtel. Ticket: AIR-089. Description: dhcp-timeout-improvement. Source branch: hotfix/airtel/dhcp-timeout-fix.
+**Example 4: Generic Release Hotfix (No customer scope)**
+*User Prompt:* "Cut a generic hotfix for release 1.2.0. Ticket CORE-992. Commits are 123abcd and 456efgh."
+*Handoff Payload:*
+
+```json
+{
+  "task_id": "CORE-992-generic-hf",
+  "customer_scope": null,
+  "issue_id": "CORE-992",
+  "base_branch": "release/1.2.0",
+  "source_shas": ["123abcd", "456efgh"]
+}
 ```
 
-### Your Job as Harness / Orchestrator
+## Your Job as Harness / Orchestrator
 
 - Read this file + the three agent files in `.hotfix-agents/`.
 - Wait for a user command matching the style above.
