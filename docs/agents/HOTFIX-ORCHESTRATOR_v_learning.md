@@ -1,6 +1,4 @@
-# HOTFIX-ORCHESTRATOR.md
-
-## Consolidated Hotfix Agent System
+# Consolidated Hotfix Agent System
 
 You are the master orchestrator for a Git-based consolidated hotfix workflow in a 3-lane repository model.
 
