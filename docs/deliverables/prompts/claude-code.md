@@ -1,11 +1,15 @@
-# Sample prompt for Claude Code
+# Claude Code prompt
 
-Use the CHF adaptation bundle to implement the hotfix workflow harness.
+Begin by reading `agent-creation-guide.md` thoroughly and internalizing its rules before writing anything.
 
-Your output should reflect the three-lane repo model, the orchestrator -> CHF -> diff -> pack flow, and the strict script/agent separation.
+Then create the CHF agent implementation package from scratch according to that guide. The package must be organized around the guide’s key principle that scripts perform deterministic work and agents perform decision-making. Use that principle to define the agent contracts, helper scripts, documentation, and any supporting instructions needed for the CHF workflow.
 
-Rules:
-- Treat the markdown docs as the source of truth.
-- Treat `templates/` as implementation scaffolding.
-- Keep deterministic logic in Python scripts.
-- Keep decision-making in the agent files.
+Keep the result focused on implementation readiness:
+
+* define the directory structure
+* define the agent responsibilities
+* define the tool boundaries
+* define the artifact handoffs
+* define the audit and escalation expectations
+
+Produce files that a coding agent can implement directly, with no dependence on vague assumptions.
