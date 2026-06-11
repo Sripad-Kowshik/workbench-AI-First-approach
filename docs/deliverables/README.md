@@ -1,122 +1,61 @@
-# Hotfix Agent System
+# CHF Agent Adaptation Bundle
 
-This repository contains a 3-agent system + orchestrator for creating consolidated hotfixes.
+This bundle breaks the consolidated hotfix workflow into separate instruction files so coding agents can implement the Elixir orchestrator and the deterministic Python tooling without mixing concerns.
 
-### Directory Structure
+## What this bundle is for
 
-How the agents files should be placed in a typical project.
+Use these documents to generate a clean harness for:
 
-```
+- a top-level hotfix orchestrator
+- a CHF execution agent
+- a diffing agent
+- a packaging agent
+- deterministic helper scripts for git, diffing, packaging, state tracking, tenant resolution, and test execution
+
+## What this bundle is not
+
+- It is not a copy of the legacy agent markdowns.
+- It does not ask an LLM to fabricate file content dynamically.
+- It does not collapse orchestration, diffing, and packaging into one prompt.
+
+## Recommended reading order
+
+1. `docs/00-scope.md`
+2. `docs/01-repo-layout.md`
+3. `docs/02-tool-surface.md`
+4. `docs/03-artifacts-and-handoffs.md`
+5. `docs/04-orchestrator-contract.md`
+6. `docs/05-chf-agent-contract.md`
+7. `docs/06-diff-agent-contract.md`
+8. `docs/07-pack-agent-contract.md`
+9. `docs/08-state-and-audit.md`
+10. `docs/09-acceptance.md`
+11. `prompts/codex.md`
+12. `prompts/gemini-cli.md`
+13. `prompts/claude-code.md`
+
+Then generate the template targets in `templates/`. Sample prompts live in `prompts/` as starting points only.
+
+## Target repo placement
+
+The generated implementation should land under a repo structure like:
+
+```text
 <project-root>/
-├── .git/
-├── ... (your source files)
-│
-├── .hotfix-agents/                  # ← Agent tooling (committed)
-│   ├── AGENTS_hcf.md
-│   ├── AGENTS_diff.md
-│   ├── AGENTS_pack.md
-│   ├── HOTFIX-ORCHESTRATOR.md       # ← Master entry point
-│   └── CHF-STATE.md                 # ← Transient runtime state (ignored)
-│
-├── HOTFIX-HISTORY.md                # ← Permanent audit log (committed)
-└── .gitignore
+├── agents/
+│   └── hotfix_orchestrator.exs
+├── scripts/
+│   ├── chf_git_ops.py
+│   ├── diff_analyzer.py
+│   ├── package_builder.py
+│   ├── state_manager.py
+│   ├── tenant_resolver.py
+│   └── test_runner.py
+├── docs/
+│   └── ...
+└── output/
 ```
 
-**Add to `.gitignore`:**
-```gitignore
-.hotfix-agents/CHF-STATE.md
-```
+## Enforcement idea
 
----
-
-## 1. Using with a Harness (Claude Code, Gemini CLI, Aider, Cursor, etc.)
-
-**Action:**
-- Feed **only** `HOTFIX-ORCHESTRATOR.md` to the harness as the initial prompt.
-- Make the three agent files (`AGENTS_hcf.md`, `AGENTS_diff.md`, `AGENTS_pack.md`) available in the same project.
-
-`HOTFIX-ORCHESTRATOR.md` will explicitly tell the harness when to load each agent file. This minimizes context bloat.
-
-**Example prompts for harness:**
-
-```
-Initialize a hotfix run for Tata. Ticket: TAT-101. Description: dns-resolution-fix. The source branch to consolidate is hotfix/tata/dhcp-scope-exhaustion.
-```
-
-```
-Start consolidated hotfix for Vodafone. Ticket: VOD-142. Description: memory-leak-fix. Source branch: hotfix/vodafone/duplicate-ip.
-```
-
----
-
-## 2. Using with a Chat Agent (Grok, Claude, GPT-4o, etc.) – for simulation
-
-**Action:**
-1. Upload **all four files** from the `.hotfix-agents/` folder at the start of the conversation.
-2. Send the following prompt:
-
-**Chat Prompt (copy-paste exactly):**
-
-```
-You are the Hotfix Agent Orchestrator.
-
-I have uploaded HOTFIX-ORCHESTRATOR.md, AGENTS_hcf.md, AGENTS_diff.md and AGENTS_pack.md.
-
-The original project goal is:
-
-I have a repo with 3 branch-lanes:
-- upstream(main) - current code
-- release - tagged releases
-- tenant - ones actually running in tenants.
-
-Each tenant can be running multiple versions and may need hotfixes and patches. We had the first release on May 1 (v1.0.0) and since then many changes have been done.
-
-The goal is to generate a hotfix for a tenant using the consolidated hotfix workflow.
-
-To simulate this, generate yourself the project structure, read and understand HOTFIX-ORCHESTRATOR.md first and then follow the instructions/request below.
-
-Here is the request:
-
-Initialize a hotfix run for Tata. 
-Ticket: TAT-101. 
-Description: dns-resolution-fix. 
-The source branch to consolidate is hotfix/tata/dhcp-scope-exhaustion.
-```
-
-**Example prompts for chat (use after the setup above):**
-
-```
-Hotfix for Tata - TAT-101 - dns-resolution-fix using source branch hotfix/tata/dhcp-scope-exhaustion
-```
-
-```
-Start consolidated hotfix for Vodafone. Ticket: VOD-142. Description: memory-leak-fix. Source branch: hotfix/vodafone/duplicate-ip.
-```
-
-```
-Create hotfix for Airtel. Ticket: AIR-089. Description: dhcp-timeout-improvement. Source branch: hotfix/airtel/dhcp-timeout-fix.
-```
-
----
-
-## 3. Using harnesses such as GitHub Agent (Experimental; may not work)
-
-**Action:**
-- The agent already has all the access it needs to the codebase. We only need to point it to read the top-level orchestrator `HOTFIX-ORCHESTRATOR.md` before feeding in the actual prompts.
-- Send the following prompt to the agent:
-
-**Prompt (copy-paste):**
-```
-You are the Hotfix Agent Orchestrator. The goal is to generate a hotfix for a tenant using the consolidated hotfix workflow.
-
-First, read and understand HOTFIX-ORCHESTRATOR.md in the `.hotfix-agents` directory, and then follow the instructions/request below.
-
-Here is the request:
-
-Initialize a hotfix run for Tata. 
-Ticket: TAT-101. 
-Description: dns-resolution-fix. 
-The source branch to consolidate is hotfix/tata/dhcp-scope-exhaustion.
-```
-
-After this run has completed, other prompts can follow.
+The agents should be allowed to decide, but only with a deterministic tool surface. All file creation, git operations, hashing, manifest emission, and packaging should be delegated to scripts.
