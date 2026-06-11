@@ -1,11 +1,13 @@
-# Sample prompt for Codex
+# Codex prompt
 
-Use the CHF adaptation bundle in this directory to generate the hotfix orchestration harness.
+First, read `agent-creation-guide.md` carefully and treat it as the authoritative source for repository structure, agent conventions, tool design, and orchestration patterns.
 
-Read the docs in order, then produce the Elixir orchestrator and the deterministic Python scripts described in `templates/`.
+After reading it, design and create the required agent files, deterministic helper scripts, and supporting markdown docs for the CHF workflow. Follow the guide’s core rule: scripts do the deterministic work, agents decide. Do not ask the model to programmatically invent file contents that should instead be produced by scripts. Use the guide to determine:
 
-Requirements:
-- Keep orchestration logic in the Elixir agent.
-- Keep all file creation, git operations, diffing, packaging, state logging, tenant validation, and test execution in scripts.
-- Preserve the branch-lane model, structured handoffs, escalation gates, and audit trail.
-- Output the adapted files into the target repository structure described in `docs/01-repo-layout.md`.
+* the directory layout
+* the orchestrator/sub-agent split
+* the minimal tool surface for each agent
+* the required handoff and artifact structure
+* the test and audit expectations
+
+Build the CHF-specific implementation so it is self-consistent, deterministic, and suitable for sandboxed execution. The resulting files should be ready for a coding agent to implement directly.
