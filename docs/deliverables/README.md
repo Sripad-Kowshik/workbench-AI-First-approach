@@ -17,7 +17,7 @@ Use in this order:
 12. `docs/11-canonical-artifact-schemas.md`
 13. `schemas/*.schema.json`
 14. `prompts/*.md`
-15. `templates/*.exs`
+15. `templates/*.exs.tpl`
 
 Design decisions baked into this bundle:
 - orchestrator-mediated phases, not CHF-owned spawning
