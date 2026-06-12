@@ -16,7 +16,7 @@ Use in this order:
 11. `docs/10-harness-capabilities-appendix.md`
 12. `docs/11-canonical-artifact-schemas.md`
 13. `schemas/*.schema.json`
-14. `prompts/codex.md`
+14. `prompts/*.md`
 15. `templates/*.exs`
 
 Design decisions baked into this bundle:
@@ -26,3 +26,5 @@ Design decisions baked into this bundle:
 - explicit escalation artifacts instead of free-form prose
 - one target base branch per CHF execution context
 - canonical JSON Schema files for every artifact family
+
+Example prompts for popular coding agents are in the `prompts` directory.
