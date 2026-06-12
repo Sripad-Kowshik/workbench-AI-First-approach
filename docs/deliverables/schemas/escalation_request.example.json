@@ -1,0 +1,54 @@
+{
+  "schema_version": "1.0",
+  "artifact_type": "escalation_request",
+  "task_id": "CHF-2026-0173",
+  "issue_id": "JIRA-4821",
+  "created_at": "2026-06-11T09:14:33Z",
+  "created_by": "state_manager.py@a1b2c3d",
+  "workspace": "/sanctioned/tmp/chf/CHF-2026-0173/tenant-acme-2.4",
+  "base_branch": "tenant/acme/2.4",
+  "hotfix_branch": "chf/acme-JIRA-4821-null-deref",
+  "base_sha": "9fceb02a4c0f6a3b9c1d2e3f4a5b6c7d8e9f0123",
+  "hotfix_sha": null,
+  "source_shas": [
+    "e83c5163316f89bf..."
+  ],
+  "confidence": "medium",
+  "blockers": [
+    {
+      "code": "CHERRY_PICK_CONFLICT",
+      "message": "conflict in src/auth/session.c",
+      "data": {
+        "sha": "e83c5163..."
+      }
+    }
+  ],
+  "validation": null,
+  "phase": "chf_execute",
+  "trigger": "CHERRY_PICK_CONFLICT",
+  "summary": "Cherry-pick conflicts in src/auth/session.c.",
+  "evidence": [
+    "output/CHF-2026-0173/conflict.log"
+  ],
+  "options": [
+    {
+      "key": "A",
+      "label": "Abort this target; continue remaining targets",
+      "consequence": "tenant loses this hotfix until retried",
+      "recommended": false
+    },
+    {
+      "key": "B",
+      "label": "Provide a manually resolved commit SHA to use instead",
+      "consequence": "rerun CHF with a corrected source commit",
+      "recommended": true
+    },
+    {
+      "key": "C",
+      "label": "Drop the conflicted commit from scope",
+      "consequence": "partial fix; requires follow-up",
+      "recommended": false
+    }
+  ],
+  "response": null
+}

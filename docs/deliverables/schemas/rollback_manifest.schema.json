@@ -1,0 +1,151 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "rollback_manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_type",
+    "task_id",
+    "issue_id",
+    "created_at",
+    "created_by",
+    "workspace",
+    "confidence",
+    "blockers",
+    "validation",
+    "packaging_manifest_ref",
+    "preserve",
+    "backup_strategy",
+    "notes"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+$"
+    },
+    "artifact_type": {
+      "const": "rollback_manifest"
+    },
+    "task_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "issue_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "created_by": {
+      "type": "string",
+      "minLength": 1
+    },
+    "workspace": {
+      "type": "string",
+      "minLength": 1
+    },
+    "base_branch": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "hotfix_branch": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "base_sha": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "hotfix_sha": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "source_shas": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{40}$"
+      },
+      "minItems": 0
+    },
+    "confidence": {
+      "type": "string",
+      "enum": [
+        "high",
+        "medium",
+        "low"
+      ]
+    },
+    "blockers": {
+      "type": "array"
+    },
+    "validation": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "packaging_manifest_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "preserve": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "dest_path",
+          "expected_pre_sha256",
+          "restore_action"
+        ],
+        "properties": {
+          "dest_path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expected_pre_sha256": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "restore_action": {
+            "type": "string",
+            "enum": [
+              "restore_file",
+              "recreate_from_backup",
+              "delete_added_file"
+            ]
+          }
+        }
+      }
+    },
+    "backup_strategy": {
+      "type": "string",
+      "enum": [
+        "sidecar_targz"
+      ]
+    },
+    "notes": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  }
+}

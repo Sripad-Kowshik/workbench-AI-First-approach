@@ -1,0 +1,248 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "packaging_manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_type",
+    "task_id",
+    "issue_id",
+    "created_at",
+    "created_by",
+    "workspace",
+    "confidence",
+    "blockers",
+    "validation",
+    "packaging_request_ref",
+    "bundle",
+    "contents",
+    "install_script",
+    "rollback_script",
+    "rollback_manifest_ref",
+    "checksums_file",
+    "verification"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+$"
+    },
+    "artifact_type": {
+      "const": "packaging_manifest"
+    },
+    "task_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "issue_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "created_by": {
+      "type": "string",
+      "minLength": 1
+    },
+    "workspace": {
+      "type": "string",
+      "minLength": 1
+    },
+    "base_branch": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "hotfix_branch": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "base_sha": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "hotfix_sha": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "source_shas": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{40}$"
+      },
+      "minItems": 0
+    },
+    "confidence": {
+      "type": "string",
+      "enum": [
+        "high",
+        "medium",
+        "low"
+      ]
+    },
+    "blockers": {
+      "type": "array"
+    },
+    "validation": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "packaging_request_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "bundle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256",
+        "size_bytes"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "size_bytes": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "contents": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "archive_path",
+          "dest_path",
+          "sha256",
+          "mode",
+          "action"
+        ],
+        "properties": {
+          "archive_path": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "dest_path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "sha256": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "mode": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^[0-7]{6}$"
+          },
+          "action": {
+            "type": "string",
+            "enum": [
+              "replace",
+              "add",
+              "delete"
+            ]
+          }
+        }
+      }
+    },
+    "install_script": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "rollback_script": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "rollback_manifest_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "checksums_file": {
+      "type": "string",
+      "minLength": 1
+    },
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "result"
+      ],
+      "properties": {
+        "method": {
+          "type": "string",
+          "enum": [
+            "extract_and_hash"
+          ]
+        },
+        "result": {
+          "type": "string",
+          "enum": [
+            "pass",
+            "fail"
+          ]
+        }
+      }
+    }
+  }
+}

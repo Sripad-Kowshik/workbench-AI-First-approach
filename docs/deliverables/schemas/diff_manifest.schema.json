@@ -1,0 +1,230 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "diff_manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_type",
+    "task_id",
+    "issue_id",
+    "created_at",
+    "created_by",
+    "workspace",
+    "confidence",
+    "blockers",
+    "validation",
+    "strategy",
+    "strategy_rationale",
+    "evidence_commands",
+    "files",
+    "generated_files",
+    "excluded_files",
+    "source_shas_confirmed"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+$"
+    },
+    "artifact_type": {
+      "const": "diff_manifest"
+    },
+    "task_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "issue_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "created_by": {
+      "type": "string",
+      "minLength": 1
+    },
+    "workspace": {
+      "type": "string",
+      "minLength": 1
+    },
+    "base_branch": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "hotfix_branch": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "base_sha": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "hotfix_sha": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "source_shas": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{40}$"
+      },
+      "minItems": 0
+    },
+    "confidence": {
+      "type": "string",
+      "enum": [
+        "high",
+        "medium",
+        "low"
+      ]
+    },
+    "blockers": {
+      "type": "array"
+    },
+    "validation": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "strategy": {
+      "type": "string",
+      "enum": [
+        "linear",
+        "range_diff",
+        "patch_id",
+        "tree_diff"
+      ]
+    },
+    "strategy_rationale": {
+      "type": "string",
+      "minLength": 1
+    },
+    "evidence_commands": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 1
+    },
+    "files": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "change",
+          "old_sha",
+          "new_sha",
+          "hunks",
+          "mode"
+        ],
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "change": {
+            "type": "string",
+            "enum": [
+              "modified",
+              "added",
+              "removed",
+              "moved"
+            ]
+          },
+          "from_path": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "old_sha": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^blob:[0-9a-f]{40}$"
+          },
+          "new_sha": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^blob:[0-9a-f]{40}$"
+          },
+          "hunks": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "mode": {
+            "type": "string",
+            "pattern": "^[0-7]{6}$"
+          }
+        }
+      }
+    },
+    "generated_files": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "reason"
+        ],
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "excluded_files": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "reason"
+        ],
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "source_shas_confirmed": {
+      "type": "boolean",
+      "const": true
+    }
+  }
+}

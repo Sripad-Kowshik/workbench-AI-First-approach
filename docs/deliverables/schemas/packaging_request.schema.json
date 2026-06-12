@@ -1,0 +1,146 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "packaging_request",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_type",
+    "task_id",
+    "issue_id",
+    "created_at",
+    "created_by",
+    "workspace",
+    "confidence",
+    "blockers",
+    "validation",
+    "diff_manifest_ref",
+    "diff_manifest_sha256",
+    "target",
+    "package_format",
+    "destination_root"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+$"
+    },
+    "artifact_type": {
+      "const": "packaging_request"
+    },
+    "task_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "issue_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "created_by": {
+      "type": "string",
+      "minLength": 1
+    },
+    "workspace": {
+      "type": "string",
+      "minLength": 1
+    },
+    "base_branch": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "hotfix_branch": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "base_sha": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "hotfix_sha": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "source_shas": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{40}$"
+      },
+      "minItems": 0
+    },
+    "confidence": {
+      "type": "string",
+      "enum": [
+        "high",
+        "medium",
+        "low"
+      ]
+    },
+    "blockers": {
+      "type": "array"
+    },
+    "validation": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "diff_manifest_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "diff_manifest_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tenant",
+        "version",
+        "platform"
+      ],
+      "properties": {
+        "tenant": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "platform": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "package_format": {
+      "type": "string",
+      "enum": [
+        "tar.gz",
+        "zip",
+        "tgz"
+      ]
+    },
+    "destination_root": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

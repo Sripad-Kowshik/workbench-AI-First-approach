@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0",
+  "artifact_type": "diff_manifest",
+  "task_id": "CHF-2026-0173",
+  "issue_id": "JIRA-4821",
+  "created_at": "2026-06-11T09:14:33Z",
+  "created_by": "diff_analyzer.py@a1b2c3d",
+  "workspace": "/sanctioned/tmp/chf/CHF-2026-0173/tenant-acme-2.4",
+  "base_branch": "tenant/acme/2.4",
+  "hotfix_branch": "chf/acme-JIRA-4821-null-deref",
+  "base_sha": "9fceb02a4c0f6a3b9c1d2e3f4a5b6c7d8e9f0123",
+  "hotfix_sha": "1c002dd4b536e7f1a2b3c4d5e6f708192a3b4c5d6",
+  "source_shas": [
+    "e83c5163316f89bf...",
+    "0d1d7fc32e5a947f..."
+  ],
+  "confidence": "high",
+  "blockers": [],
+  "validation": null
+}
